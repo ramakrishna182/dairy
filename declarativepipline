@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    tools {
+        maven "mav"
+    }
+
+    stages {
+        stage('env setup') {
+            steps {
+               
+               git credentialsId: 'github', url: 'https://github.com/ramakrishna182/dairy.git'
+            }
+            
+        }
+        stage('compile and tes') {
+            steps {
+               sh 'mvn clean test'
+               sh 'pwd'
+            }
+            
+        }
+        stage('package') {
+            steps {
+               sh 'mvn clean package'
+            }
+            post {
+                success{
+                   archive 'target/*.war'
+                }
+            }
+            
+        }
+        stage('deploy'){
+            steps{
+                sh 'mvn deploy'
+            }
+        }
+    }
+}
+    
